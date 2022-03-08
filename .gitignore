@@ -1,0 +1,8 @@
+
+*.xml
+*.dll
+*.nuspec
+*.sha512
+*.nupkg
+*.p7s
+*.metadata
