@@ -4,32 +4,52 @@
 #r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
 open FSharp.Text.Lexing
 open System
-#load "CalculatorTypesAST.fs"
-open CalculatorTypesAST
-#load "CalculatorParser.fs"
-open CalculatorParser
-#load "CalculatorLexer.fs"
-open CalculatorLexer
+#load "PracticalAssignmentTypesAST.fs"
+open PracticalAssignmentTypesAST
+#load "PracticalAssignmentParser.fs"
+open PracticalAssignmentParser
+#load "PracticalAssignmentLexer.fs"
+open PracticalAssignmentLexer
 
 // We define the evaluation function recursively, by induction on the structure
 // of arithmetic expressions (AST of type expr)
-let rec eval e =
+let rec evalA e =
   match e with
-    | Num(x) -> x
-    | TimesExpr(x,y) -> eval(x) * eval (y)
-    | DivExpr(x,y) -> eval(x) / eval (y)
-    | PlusExpr(x,y) -> eval(x) + eval (y)
-    | MinusExpr(x,y) -> eval(x) - eval (y)
-    | PowExpr(x,y) -> eval(x) ** eval (y)
-    | UPlusExpr(x) -> eval(x)
-    | UMinusExpr(x) -> - eval(x)
+    | n(x) -> string x
+    | x(x) -> x
+    | A(x, y) -> x + "[" + evalA(y) + "]"
+    | Times(x,y) -> evalA(x) + "*" + evalA(y)
+    | Div(x,y) -> evalA(x) + "/" + evalA(y)
+    | Plus(x,y) -> evalA(x) + "+" + evalA(y)
+    | Minus(x,y) -> evalA(x) + "-" + evalA(y)
+    | Pow(x,y) -> evalA(x) + "**" + evalA(y)
+    | UMinus(x) -> "-" + evalA(x)
+    | ParA(x) -> "(" + evalA(x) + ")"
+
+let rec evalB e = 
+  match e with
+    | Bool(true) -> "true"
+    | Bool(false) -> "false"
+    | SCAnd(x, y) -> evalB(x) + "&" + evalB(y)
+    | SCOr(x, y) -> evalB(x) + "|" + evalB(y)
+    | And(x, y) -> evalB(x) + "&&" + evalB(y)
+    | Or(x, y) -> evalB(x) + "||" + evalB(y)
+    | Not(x) -> "!" + evalB(x)
+    | Equal(x, y) -> evalA(x) + "=" + evalA(y)
+    | NEqual(x, y) -> evalA(x) + "!=" + evalA(y)
+    | GreaterThan(x, y) -> evalA(x) + ">" + evalA(y)
+    | GreaterEqual(x, y) -> evalA(x) + ">=" + evalA(y)
+    | LessThan(x, y) -> evalA(x) + "<" + evalA(y)
+    | LessEqual(x, y) -> evalA(x) + "<=" + evalA(y)
+    | ParB(x) -> "(" + evalB(x) + ")"
+
 
 // We
 let parse input =
     // translate string into a buffer of characters
     let lexbuf = LexBuffer<char>.FromString input
     // translate the buffer into a stream of tokens and parse them
-    let res = CalculatorParser.start CalculatorLexer.tokenize lexbuf
+    let res = PracticalAssignmentParser.start PracticalAssignmentLexer.tokenize lexbuf
     // return the result of parsing (i.e. value of type "expr")
     res
 
