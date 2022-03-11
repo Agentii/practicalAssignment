@@ -13,11 +13,13 @@ open PracticalAssignmentLexer
 
 // We define the evaluation function recursively, by induction on the structure
 // of arithmetic expressions (AST of type expr)
+
+
 let rec evalA e =
   match e with
-    | n(x) -> string x
-    | x(x) -> x
-    | A(x, y) -> x + "[" + evalA(y) + "]"
+    | Num(x) -> string x
+    | Var(x) -> x
+    | Arr(x, y) -> x + "[" + evalA(y) + "]"
     | Times(x,y) -> evalA(x) + "*" + evalA(y)
     | Div(x,y) -> evalA(x) + "/" + evalA(y)
     | Plus(x,y) -> evalA(x) + "+" + evalA(y)
@@ -43,6 +45,19 @@ let rec evalB e =
     | LessEqual(x, y) -> evalA(x) + "<=" + evalA(y)
     | ParB(x) -> "(" + evalB(x) + ")"
 
+let rec evalC e = 
+  match e with
+    | Ass(x, y) -> x + " := " + evalA(y)
+    | ArrAss(x, y) -> evalA(x) + " := " + evalA(y)
+    | Seq(x, y) -> evalC(x) + " ; " + evalC(y)
+    | If(x) -> "if " + evalGC(x) + " fi"
+    | Do(x) -> "do " + evalGC(x) + " od"
+    | Skip -> "skip"
+
+and evalGC e =
+  match e with
+    | Eval(x, y) -> evalB(x) + " -> " + evalC(y)
+    | Branch(x, y) -> evalGC(x) + " [] " + evalGC(y)
 
 // We
 let parse input =
@@ -59,13 +74,13 @@ let rec compute n =
         printfn "Bye bye"
     else
         printf "Enter an arithmetic expression: "
-        try
+        //try
         // We parse the input string
         let e = parse (Console.ReadLine())
         // and print the result of evaluating it
-        printfn "Result: %f" (eval(e))
+        printfn "Result: %s" (evalC(e))
         compute n
-        with err -> compute (n-1)
+        //with err -> compute (n-1)
 
 // Start interacting with the user
 compute 3

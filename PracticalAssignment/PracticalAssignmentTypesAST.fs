@@ -3,9 +3,9 @@
 module PracticalAssignmentTypesAST
 
 type a =
-  | n of float 
-  | x of string
-  | A of (string * a)
+  | Num of float 
+  | Var of string
+  | Arr of (string * a)
   | Times of (a * a)
   | Div of (a * a)
   | Plus of (a * a)
@@ -30,8 +30,9 @@ type b =
   | ParB of b
 
 type C =
-  | Ass of (a * a)
-  | skip
+  | Ass of (string * a)
+  | ArrAss of (a * a)
+  | Skip
   | Seq of (C * C)
   | If of GC
   | Do of GC
@@ -39,4 +40,6 @@ type C =
 and GC = 
   | Eval of (b * C)
   | Branch of (GC * GC)
+
+
 

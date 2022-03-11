@@ -17,7 +17,7 @@ let num         = digit+ ( '.' digit+)?  ('E' ('+'|'-')? digit+ )?
 let whitespace  = [' ' '\t']
 let newline     = "\n\r" | '\n' | '\r'
 let char        = ['a'-'z''A'-'Z']
-let name        = ['a'-'z''A'-'Z']['a'-'z''A'-'Z']*
+let name        = char ['a'-'z''A'-'Z''0'-'9']*
 
 // We define now the rules for recognising and building tokens
 // for each of the tokens of our language we need a rule
@@ -29,11 +29,19 @@ rule tokenize = parse
 | newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
 // deal with tokens that need to be built
 | num           { NUM(Double.Parse(LexBuffer<_>.LexemeString lexbuf)) }
-| name          { let str = LexBuffer<_>.LexemeString lexbuf in NAME(str) }
+| "true"        { TRUE }
+| "false"       { FALSE }
+| "[]"          { BRANCH }
 | '['           { LBRACK }
 | ']'           { RBRACK }
 | '('           { LPAR }
 | ')'           { RPAR }
+| "!="          { NEQ }
+| "<="          { LEQ }
+| ">="          { GEQ }
+| ":="          { ASS }
+| '='           { EQ }
+| "->"          { EVAL }
 | '-'           { UMINUS }
 | '^'           { POW }
 | '!'           { NOT }
@@ -41,17 +49,19 @@ rule tokenize = parse
 | '/'           { DIV }
 | '+'           { PLUS }
 | '-'           { MINUS }
-| eof           { EOF }
 | ';'           { SEMCOL }
-| '&'           { SCAND }
-| '|'           { SCOR }
 | "&&"          { AND }
+| '&'           { SCAND }
 | "||"          { OR }
+| '|'           { SCOR }
 | '<'           { LT }
 | '>'           { GT }
-| '='           { EQ }
-| "!="          { NEQ }
-| "<="          { LEQ }
-| ">="          { GEQ }
-| ":="          { ASS }
-| "->"          { EVAL }
+| eof           { EOF }
+| "skip"        { SKIP }
+| "if"          { IF }
+| "fi"          { FI } 
+| "do"          { DO }
+| "od"          { OD }
+| name          { let str = LexBuffer<_>.LexemeString lexbuf in NAME(str) }
+
+
