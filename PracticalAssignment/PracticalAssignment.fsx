@@ -73,7 +73,7 @@ let rec compute n =
     if n = 0 then
         printfn "Bye bye"
     else
-        printf "Enter an arithmetic expression: "
+        printf "Enter an GCL expression: "
         //try
         // We parse the input string
         let e = parse (Console.ReadLine())
