@@ -11,6 +11,9 @@ open PracticalAssignmentParser
 #load "PracticalAssignmentLexer.fs"
 open PracticalAssignmentLexer
 
+#load "PracticalAssignmentCompiler.fsx"
+open PracticalAssignmentCompiler
+
 // We define the evaluation function recursively, by induction on the structure
 // of arithmetic expressions (AST of type expr)
 
@@ -74,13 +77,16 @@ let rec compute n =
         printfn "Bye bye"
     else
         printf "Enter an GCL expression: "
-        //try
-        // We parse the input string
-        let e = parse (Console.ReadLine())
-        // and print the result of evaluating it
-        printfn "Result: %s" (evalC(e))
-        compute n
-        //with err -> compute (n-1)
+        try
+          // We parse the input string
+          let e = parse (Console.ReadLine())
+          // and print the result of evaluating it
+          let res = compile e
+          printfn "Result: %s" (evalC(e))
+          printfn "List: %A" res
+          compute n
+        with error -> compute (n-1)
+
 
 // Start interacting with the user
-compute 3
+compute 3  // 3 is the number of allowed failures
