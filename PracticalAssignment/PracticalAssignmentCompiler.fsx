@@ -1,7 +1,7 @@
 module PracticalAssignmentCompiler
 
-#load "PracticalAssignmentTypesAST.fs"
-open PracticalAssignmentTypesAST
+//#load "PracticalAssignmentTypesAST.fs"
+//open PracticalAssignmentTypesAST
 
 
 type label =
@@ -32,12 +32,13 @@ let compile inp =
         match inp with
         | Skip -> [Edge(q1, SkipLabel, q2)]
         | Ass(x, y) -> [Edge(q1, AssignmentLabel(x, y), q2)]
-        | Seq(c1, c2) -> let depth1 = depthCount c1 0
-                         (compile n (n+1) c1 (n+1)) @ (compile (n+depth1) (n+depth1+1) c2 (n+depth1+1))
-        | If(gc) -> []
+        | Seq(c1, c2) -> let depth = depthCount c1 0
+                         (compile q1 q2 c1 q2) @ (compile (q1+depth) (q1+depth+1) c2 (q1+depth+1))
+        | If(Eval(b, c)) -> [Edge(q1, ConditionLabel(b), q2)] @ compile q2 (q2+1) c (q2+1)
+        | If(Branch(gc1, gc2)) -> (compile q1 q2 gc1 q2) @ (compile q1 (n+1) gc2 q2)
         | Do(gc) -> []
         | _ -> failwith ("Compile error!")
 
     compile 0 1 inp 0
 
-// y:= 1; (x:=2; z:=4)
+// y:= 1; x:=2; z:=4

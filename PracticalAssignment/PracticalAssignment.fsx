@@ -85,7 +85,8 @@ let rec compute n =
           printfn "Result: %s" (evalC(e))
           printfn "List: %A" res
           compute n
-        with error -> compute (n-1)
+        with error -> printfn "Error: Wromg input"
+                      compute (n-1)
 
 
 // Start interacting with the user
