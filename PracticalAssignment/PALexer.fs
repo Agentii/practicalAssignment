@@ -1,16 +1,16 @@
-# 2 "PracticalAssignmentLexer.fsl"
+# 2 "PALexer.fsl"
  
-module PracticalAssignmentLexer
+module PALexer
 open FSharp.Text.Lexing
 open System
 
 // open the module that defines the tokens
-open PracticalAssignmentParser
+open PAParser
 
 // Set the language to English such that 4.0 is parsed as 4 and not 40.
 System.Globalization.CultureInfo.CurrentCulture <- new System.Globalization.CultureInfo("en-US")
 
-# 13 "PracticalAssignmentLexer.fs"
+# 13 "PALexer.fs"
 let trans : uint16[] array = 
     [| 
     (* State 0 *)
@@ -136,197 +136,192 @@ let trans : uint16[] array =
     (* State 60 *)
      [| 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 60us; 60us; 60us; 60us; 60us; 60us; 60us; 60us; 60us; 60us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; |];
     |] 
-let actions : uint16[] = [|65535us; 0us; 1us; 1us; 2us; 36us; 36us; 6us; 7us; 8us; 9us; 18us; 28us; 29us; 65535us; 14us; 16us; 17us; 19us; 20us; 21us; 23us; 25us; 27us; 30us; 36us; 36us; 36us; 36us; 36us; 36us; 35us; 34us; 32us; 36us; 36us; 31us; 26us; 24us; 15us; 13us; 12us; 11us; 10us; 5us; 36us; 33us; 36us; 36us; 4us; 36us; 36us; 3us; 65535us; 65535us; 2us; 2us; 2us; 2us; 65535us; 2us; |]
+let actions : uint16[] = [|65535us; 0us; 1us; 1us; 2us; 35us; 35us; 6us; 7us; 8us; 9us; 17us; 27us; 28us; 65535us; 14us; 21us; 16us; 18us; 19us; 20us; 22us; 24us; 26us; 29us; 35us; 35us; 35us; 35us; 35us; 35us; 34us; 33us; 31us; 35us; 35us; 30us; 25us; 23us; 15us; 13us; 12us; 11us; 10us; 5us; 35us; 32us; 35us; 35us; 4us; 35us; 35us; 3us; 65535us; 65535us; 2us; 2us; 2us; 2us; 65535us; 2us; |]
 let _fslex_tables = FSharp.Text.Lexing.UnicodeTables.Create(trans,actions)
 let rec _fslex_dummy () = _fslex_dummy() 
 // Rule tokenize
 and tokenize  lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 28 "PracticalAssignmentLexer.fsl"
+# 28 "PALexer.fsl"
                                  tokenize lexbuf 
-# 148 "PracticalAssignmentLexer.fs"
+# 148 "PALexer.fs"
           )
   | 1 -> ( 
-# 29 "PracticalAssignmentLexer.fsl"
+# 29 "PALexer.fsl"
                                  lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; 
-# 153 "PracticalAssignmentLexer.fs"
+# 153 "PALexer.fs"
           )
   | 2 -> ( 
-# 31 "PracticalAssignmentLexer.fsl"
+# 31 "PALexer.fsl"
                                  NUM(Double.Parse(LexBuffer<_>.LexemeString lexbuf)) 
-# 158 "PracticalAssignmentLexer.fs"
+# 158 "PALexer.fs"
           )
   | 3 -> ( 
-# 32 "PracticalAssignmentLexer.fsl"
+# 32 "PALexer.fsl"
                                  TRUE 
-# 163 "PracticalAssignmentLexer.fs"
+# 163 "PALexer.fs"
           )
   | 4 -> ( 
-# 33 "PracticalAssignmentLexer.fsl"
+# 33 "PALexer.fsl"
                                  FALSE 
-# 168 "PracticalAssignmentLexer.fs"
+# 168 "PALexer.fs"
           )
   | 5 -> ( 
-# 34 "PracticalAssignmentLexer.fsl"
+# 34 "PALexer.fsl"
                                  BRANCH 
-# 173 "PracticalAssignmentLexer.fs"
+# 173 "PALexer.fs"
           )
   | 6 -> ( 
-# 35 "PracticalAssignmentLexer.fsl"
+# 35 "PALexer.fsl"
                                  LBRACK 
-# 178 "PracticalAssignmentLexer.fs"
+# 178 "PALexer.fs"
           )
   | 7 -> ( 
-# 36 "PracticalAssignmentLexer.fsl"
+# 36 "PALexer.fsl"
                                  RBRACK 
-# 183 "PracticalAssignmentLexer.fs"
+# 183 "PALexer.fs"
           )
   | 8 -> ( 
-# 37 "PracticalAssignmentLexer.fsl"
+# 37 "PALexer.fsl"
                                  LPAR 
-# 188 "PracticalAssignmentLexer.fs"
+# 188 "PALexer.fs"
           )
   | 9 -> ( 
-# 38 "PracticalAssignmentLexer.fsl"
+# 38 "PALexer.fsl"
                                  RPAR 
-# 193 "PracticalAssignmentLexer.fs"
+# 193 "PALexer.fs"
           )
   | 10 -> ( 
-# 39 "PracticalAssignmentLexer.fsl"
+# 39 "PALexer.fsl"
                                  NEQ 
-# 198 "PracticalAssignmentLexer.fs"
+# 198 "PALexer.fs"
           )
   | 11 -> ( 
-# 40 "PracticalAssignmentLexer.fsl"
+# 40 "PALexer.fsl"
                                  LEQ 
-# 203 "PracticalAssignmentLexer.fs"
+# 203 "PALexer.fs"
           )
   | 12 -> ( 
-# 41 "PracticalAssignmentLexer.fsl"
+# 41 "PALexer.fsl"
                                  GEQ 
-# 208 "PracticalAssignmentLexer.fs"
+# 208 "PALexer.fs"
           )
   | 13 -> ( 
-# 42 "PracticalAssignmentLexer.fsl"
+# 42 "PALexer.fsl"
                                  ASS 
-# 213 "PracticalAssignmentLexer.fs"
+# 213 "PALexer.fs"
           )
   | 14 -> ( 
-# 43 "PracticalAssignmentLexer.fsl"
+# 43 "PALexer.fsl"
                                  EQ 
-# 218 "PracticalAssignmentLexer.fs"
+# 218 "PALexer.fs"
           )
   | 15 -> ( 
-# 44 "PracticalAssignmentLexer.fsl"
+# 44 "PALexer.fsl"
                                  EVAL 
-# 223 "PracticalAssignmentLexer.fs"
+# 223 "PALexer.fs"
           )
   | 16 -> ( 
-# 45 "PracticalAssignmentLexer.fsl"
-                                 UMINUS 
-# 228 "PracticalAssignmentLexer.fs"
+# 45 "PALexer.fsl"
+                                 POW 
+# 228 "PALexer.fs"
           )
   | 17 -> ( 
-# 46 "PracticalAssignmentLexer.fsl"
-                                 POW 
-# 233 "PracticalAssignmentLexer.fs"
+# 46 "PALexer.fsl"
+                                 NOT 
+# 233 "PALexer.fs"
           )
   | 18 -> ( 
-# 47 "PracticalAssignmentLexer.fsl"
-                                 NOT 
-# 238 "PracticalAssignmentLexer.fs"
+# 47 "PALexer.fsl"
+                                 TIMES 
+# 238 "PALexer.fs"
           )
   | 19 -> ( 
-# 48 "PracticalAssignmentLexer.fsl"
-                                 TIMES 
-# 243 "PracticalAssignmentLexer.fs"
+# 48 "PALexer.fsl"
+                                 DIV 
+# 243 "PALexer.fs"
           )
   | 20 -> ( 
-# 49 "PracticalAssignmentLexer.fsl"
-                                 DIV 
-# 248 "PracticalAssignmentLexer.fs"
+# 49 "PALexer.fsl"
+                                 PLUS 
+# 248 "PALexer.fs"
           )
   | 21 -> ( 
-# 50 "PracticalAssignmentLexer.fsl"
-                                 PLUS 
-# 253 "PracticalAssignmentLexer.fs"
+# 50 "PALexer.fsl"
+                                 MINUS 
+# 253 "PALexer.fs"
           )
   | 22 -> ( 
-# 51 "PracticalAssignmentLexer.fsl"
-                                 MINUS 
-# 258 "PracticalAssignmentLexer.fs"
+# 51 "PALexer.fsl"
+                                 SEMCOL 
+# 258 "PALexer.fs"
           )
   | 23 -> ( 
-# 52 "PracticalAssignmentLexer.fsl"
-                                 SEMCOL 
-# 263 "PracticalAssignmentLexer.fs"
+# 52 "PALexer.fsl"
+                                 AND 
+# 263 "PALexer.fs"
           )
   | 24 -> ( 
-# 53 "PracticalAssignmentLexer.fsl"
-                                 AND 
-# 268 "PracticalAssignmentLexer.fs"
+# 53 "PALexer.fsl"
+                                 SCAND 
+# 268 "PALexer.fs"
           )
   | 25 -> ( 
-# 54 "PracticalAssignmentLexer.fsl"
-                                 SCAND 
-# 273 "PracticalAssignmentLexer.fs"
+# 54 "PALexer.fsl"
+                                 OR 
+# 273 "PALexer.fs"
           )
   | 26 -> ( 
-# 55 "PracticalAssignmentLexer.fsl"
-                                 OR 
-# 278 "PracticalAssignmentLexer.fs"
+# 55 "PALexer.fsl"
+                                 SCOR 
+# 278 "PALexer.fs"
           )
   | 27 -> ( 
-# 56 "PracticalAssignmentLexer.fsl"
-                                 SCOR 
-# 283 "PracticalAssignmentLexer.fs"
+# 56 "PALexer.fsl"
+                                 LT 
+# 283 "PALexer.fs"
           )
   | 28 -> ( 
-# 57 "PracticalAssignmentLexer.fsl"
-                                 LT 
-# 288 "PracticalAssignmentLexer.fs"
+# 57 "PALexer.fsl"
+                                 GT 
+# 288 "PALexer.fs"
           )
   | 29 -> ( 
-# 58 "PracticalAssignmentLexer.fsl"
-                                 GT 
-# 293 "PracticalAssignmentLexer.fs"
+# 58 "PALexer.fsl"
+                                 EOF 
+# 293 "PALexer.fs"
           )
   | 30 -> ( 
-# 59 "PracticalAssignmentLexer.fsl"
-                                 EOF 
-# 298 "PracticalAssignmentLexer.fs"
+# 59 "PALexer.fsl"
+                                 SKIP 
+# 298 "PALexer.fs"
           )
   | 31 -> ( 
-# 60 "PracticalAssignmentLexer.fsl"
-                                 SKIP 
-# 303 "PracticalAssignmentLexer.fs"
+# 60 "PALexer.fsl"
+                                 IF 
+# 303 "PALexer.fs"
           )
   | 32 -> ( 
-# 61 "PracticalAssignmentLexer.fsl"
-                                 IF 
-# 308 "PracticalAssignmentLexer.fs"
+# 61 "PALexer.fsl"
+                                 FI 
+# 308 "PALexer.fs"
           )
   | 33 -> ( 
-# 62 "PracticalAssignmentLexer.fsl"
-                                 FI 
-# 313 "PracticalAssignmentLexer.fs"
+# 62 "PALexer.fsl"
+                                 DO 
+# 313 "PALexer.fs"
           )
   | 34 -> ( 
-# 63 "PracticalAssignmentLexer.fsl"
-                                 DO 
-# 318 "PracticalAssignmentLexer.fs"
+# 63 "PALexer.fsl"
+                                 OD 
+# 318 "PALexer.fs"
           )
   | 35 -> ( 
-# 64 "PracticalAssignmentLexer.fsl"
-                                 OD 
-# 323 "PracticalAssignmentLexer.fs"
-          )
-  | 36 -> ( 
-# 65 "PracticalAssignmentLexer.fsl"
+# 64 "PALexer.fsl"
                                  let str = LexBuffer<_>.LexemeString lexbuf in NAME(str) 
-# 328 "PracticalAssignmentLexer.fs"
+# 323 "PALexer.fs"
           )
   | _ -> failwith "tokenize"
 
-# 3000000 "PracticalAssignmentLexer.fs"
+# 3000000 "PALexer.fs"

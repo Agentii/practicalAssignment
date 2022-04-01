@@ -1,6 +1,6 @@
 // This file implements a module where we define a data type "expr"
 // to store represent arithmetic expressions
-module PracticalAssignmentTypesAST
+module PATypesAST
 
 type a =
   | Num of float 

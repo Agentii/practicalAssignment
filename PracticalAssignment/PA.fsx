@@ -1,21 +1,12 @@
-// This script implements our interactive calculator
-
-// We need to import a couple of modules, including the generated lexer and parser
 #r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
 open FSharp.Text.Lexing
 open System
-#load "PracticalAssignmentTypesAST.fs"
-open PracticalAssignmentTypesAST
-#load "PracticalAssignmentParser.fs"
-open PracticalAssignmentParser
-#load "PracticalAssignmentLexer.fs"
-open PracticalAssignmentLexer
-
-#load "PracticalAssignmentCompiler.fsx"
-open PracticalAssignmentCompiler
-
-// We define the evaluation function recursively, by induction on the structure
-// of arithmetic expressions (AST of type expr)
+#load "PATypesAST.fs"
+open PATypesAST
+#load "PAParser.fs"
+open PAParser
+#load "PALexer.fs"
+open PALexer
 
 
 let rec evalA e =
@@ -62,12 +53,17 @@ and evalGC e =
     | Eval(x, y) -> evalB(x) + " -> " + evalC(y)
     | Branch(x, y) -> evalGC(x) + " [] " + evalGC(y)
 
+#load "PACompiler.fsx"
+open PACompiler
+#load "PAInterpreter.fsx"
+open PAInterpreter
+
 // We
 let parse input =
     // translate string into a buffer of characters
     let lexbuf = LexBuffer<char>.FromString input
     // translate the buffer into a stream of tokens and parse them
-    let res = PracticalAssignmentParser.start PracticalAssignmentLexer.tokenize lexbuf
+    let res = PAParser.start PALexer.tokenize lexbuf
     // return the result of parsing (i.e. value of type "expr")
     res
 
@@ -77,17 +73,27 @@ let rec compute n =
         printfn "Bye bye"
     else
         printf "Enter an GCL expression: "
-        try
-          // We parse the input string
-          let e = parse (Console.ReadLine())
-          // and print the result of evaluating it
-          let res = compile e
-          printfn "Result: %s" (evalC(e))
-          printfn "List: %A" res
-          compute n
-        with error -> printfn "Error: Wromg input"
-                      compute (n-1)
+        //try
+        // We parse the input string
+        let e = parse (Console.ReadLine())
+        // and print the result of evaluating it
+        printfn "Result: %s" (evalC(e))
+        
+        let res = compile e
+        printfn "List:\n%A" res
+        printfn "%s" (graphvizPrinter(res))
+
+        printfn "%s" (interpreter e)
+
+        compute n
+        //with error -> printfn "Error: Wrong input"
+        //              compute (n-1)
 
 
 // Start interacting with the user
 compute 3  // 3 is the number of allowed failures
+
+// y:= 1; x:=2; z:=4
+// x:=1; y:=1; z:=1; r:=1; s:=1
+// x:=2+2; if x>2 -> x:=1 [] x=2 -> x:=0 [] x<2 -> x:=-1 fi
+// x:=2+2; if x>2 -> x:=1 [] x=2 -> do x<0 -> x:=1 od [] x<2 -> x:=-1 fi
