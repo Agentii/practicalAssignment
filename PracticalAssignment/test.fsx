@@ -65,9 +65,17 @@ let interpreter gcl =
     let allowedSteps = int (System.Console.ReadLine())
     printfn "%s" (stepPrinter "" q0 mem false)
     let rec interpreter edges node steps stuck = 
-        match edges, steps with
-        | (_, steps) when steps >= allowedSteps -> "\nMax allowed steps reached!\nProgram terminated...\n"
-        | ((node, label, q2)::edges, _) -> let action = labelPrinter(label)
+        match steps with
+        | steps when steps >= allowedSteps -> "\nMax allowed steps reached!\nProgram terminated...\n"
+        | _ -> let goodEdges = executable(edges,node)
+        // check if goodEdges is empty
+               let edge = chooose(goodEdges)
+               let newnode = nextNodeAndeMemory(edge)
+               interpreter(edges,newnode)
+
+let compute nextNoodeAndMemory edge     
+       match edge with
+        ((node, label, q2)) -> let action = labelPrinter(label)
                                         match label with
                                         | AssignmentLabel(k, v) ->  let v = evalAExp v mem
                                                                     mem <- Map.add k v mem
