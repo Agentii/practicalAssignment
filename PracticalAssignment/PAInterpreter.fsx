@@ -7,12 +7,6 @@ open PATypesAST
 open PACompiler
 *)
 
-let stepPrinter action node memory stuck =
-    match stuck with
-    | true -> ""
-    | false -> let memoryString = Map.fold (fun e k v -> e + string(k) + ": " + string(v) + "\n") "" memory
-               "\nAction: " + action + "\nNode: q" + string(node) + "\n" + memoryString
-
 let initMemory () =
     let mutable memory = Map []
     printf "Initialize variables: "
@@ -57,27 +51,52 @@ and powOf(x, y) =
     | 0 -> x
     | _ -> powOf(x*x, y-1)
 
+let memoryToString mem = Map.fold (fun e k v -> e + string(k) + ": " + string(v) + "\n") "" mem
+
+let stepPrinter actionString nodeString memString = printfn "\nAction: %s\nNode: q%s\n%s" actionString nodeString memString
+
+let rec findNextEdge currNode edges mem =
+    match edges with
+    | (q1, label, q2)::edges when currNode = q1 -> match label with
+                                                   | AssignmentLabel(k, v) -> Some (q1, label, q2)
+                                                   | SkipLabel -> Some (q1, label, q2)
+                                                   | ConditionLabel(b) when evalBExp b mem -> Some (q1, label, q2)
+                                                   | _ -> findNextEdge currNode edges mem
+    | _::edges -> findNextEdge currNode edges mem
+    | [] -> None
+
+
 let interpreter gcl =
     let edges = compile gcl
     let q0 = 0
+    let qfinal = edges.Length
     let mutable mem = initMemory ()
     printf "Enter allowed steps: "
     let allowedSteps = int (System.Console.ReadLine())
-    printfn "%s" (stepPrinter "" q0 mem false)
-    let rec interpreter edges node steps stuck = 
-        match edges, steps with
-        | (_, steps) when steps >= allowedSteps -> "\nMax allowed steps reached!\nProgram terminated...\n"
-        | ((node, label, q2)::edges, _) -> let action = labelPrinter(label)
-                                        match label with
-                                        | AssignmentLabel(k, v) ->  let v = evalAExp v mem
-                                                                    mem <- Map.add k v mem
-                                                                    (stepPrinter action q2 mem stuck) + (interpreter edges q2 (steps+1) stuck)
-                                        | SkipLabel -> false
-                                        | ConditionLabel(b)-> not(evalBExp b mem)
+    stepPrinter ("") (string q0) (memoryToString(mem))
+
+    let evalEdge edge =
+        match edge with
+        | (_, label, q2) -> let action = labelPrinter(label)
+                            let node = string q2
+                            let memory = match label with
+                                            | AssignmentLabel(k, v) ->  let v = evalAExp v mem
+                                                                        mem <- Map.add k v mem
+                                                                        memoryToString(mem)
+                                            | _ -> memoryToString(mem)
                                         
-                                   
-        | ([], _) -> "\nAction: Successfully terminated in " + string(steps) + " steps."
-    interpreter edges 0 false
+                            stepPrinter action node memory
+
+    let rec interpreter node steps = 
+        match steps with
+        | steps when steps >= allowedSteps -> "\nMax allowed steps reached!\nProgram terminated...\n"
+        | _ -> let nextEdge = findNextEdge node edges mem
+               match nextEdge with
+               | Some (q1, label, q2) -> evalEdge (q1, label, q2)
+                                         if q2 = qfinal then ("Succesfully terminated in " + string(qfinal) + " steps!") else interpreter q2 (steps+1)
+               | None -> "Action: Stuck"
+                
+    interpreter q0 0     
 
 
 
