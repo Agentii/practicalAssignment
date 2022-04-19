@@ -67,7 +67,9 @@ let rec findNextEdge currNode edges mem =
 
 
 let interpreter gcl =
-    let edges = compile gcl
+    printf "Deterministic? [true/false]: "
+    let deterministic = (System.Console.ReadLine()) = "true"
+    let edges = compile gcl deterministic 
     let q0 = 0
     let qfinal = edges.Length
     let mutable mem = initMemory ()

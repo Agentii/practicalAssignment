@@ -79,7 +79,7 @@ let rec compute n =
         // and print the result of evaluating it
         printfn "Result: %s" (evalC(e))
         
-        let res = compile e
+        let res = compile e false
         printfn "List:\n%A" res
         printfn "%s" (graphvizPrinter(res))
 

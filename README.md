@@ -1,9 +1,17 @@
 
+To generate the lexer: 
+
+fslex PALexer.fsl --unicode
+ 
+
+To generate the parser:
+
+fsyacc PAParser.fsp --module PAParser
+
 
 To run the program write in a terminal in the folder PracticalAssignment 
 
-
-dotnet fsi PracticalAssignment.fsx 
+dotnet fsi PA.fsx 
 
 Key files are all in the PracticalAssignment folder.
 
