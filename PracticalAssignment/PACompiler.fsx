@@ -5,12 +5,12 @@ module PACompiler
 open PATypesAST
 *)
 
-type label =
+type Label =
     | AssignmentLabel of (string * a)
     | SkipLabel
     | ConditionLabel of b
 
-type Edge = (int * label * int)
+type Edge = (int * Label * int)
 
 
 let rec depthCount C e = 
@@ -29,21 +29,23 @@ and depthCountGC gc e =
 
 let rec doneGC gc =
     match gc with
-    | Eval(b, _) -> Not(b)
+    | Eval(b, _) -> Not(ParB(b))
     | Branch(gc1, gc2) -> And(doneGC(gc1), doneGC(gc2))
 
 let detCondition b bList = 
     match bList with
     | [] -> b
-    | [x] -> And(b, Not(x))
-    | e::bs -> And(b, Not(List.fold (fun e x -> Or(x, e)) e bs))
+    | [x] -> And(b, Not(ParB(x)))
+    | e::bs -> And(b, Not(ParB(List.fold (fun e x -> Or(x, e)) e bs)))
 
 let rec genBList gc bList =
     match gc with
     | Eval(b, _) -> b::bList
-    | Branch(gc1, gc2) -> genBList gc1 bList @ genBList gc2 []
+    | _ -> bList
 
-let compile inp det =
+let compile inp =
+    printf "\nDeterministic? [true/false]: "
+    let det = (System.Console.ReadLine()) = "true"
     let q2 = depthCount inp 0
     let rec compile inp q1 q2 =
         match inp with
@@ -53,7 +55,7 @@ let compile inp det =
                          (compile c1 q1 q) @ (compile c2 q q2)
         | If(gc) -> if det then compileDetGC gc q1 q2 (q1+1) ([Bool(false)]) else compileGC gc q1 q2 (q1+1)
         | Do(gc) -> let b = doneGC(gc)
-                    if det then (compileDetGC gc q1 q1 (q1+1) ([Bool(false)])) else (compileGC gc q1 q1 (q1+1)) @ [Edge(q1, ConditionLabel(b), q2)]
+                    (if det then (compileDetGC gc q1 q1 (q1+1) ([Bool(false)])) else (compileGC gc q1 q1 (q1+1))) @ [Edge(q1, ConditionLabel(b), q2)]
         | _ -> failwith ("Compile error!")
     
     and compileGC gc q1 q2 q =
@@ -63,7 +65,6 @@ let compile inp det =
                               (compileGC gc1 q1 q2 q) @ (compileGC gc2 q1 q2 qn)
     
     and compileDetGC gc q1 q2 q bList =
-        let mutable bList = []
         match gc with
         | Eval(b, c) -> [Edge(q1, ConditionLabel(detCondition b bList), q)] @ (compile c q q2)
         | Branch(gc1, gc2) -> let qn = depthCountGC gc1 q - 1
@@ -80,8 +81,8 @@ let labelPrinter label =
 let rec graphvizConverter pg = 
     match pg with
     | [] -> ""
-    | [(q1, label, q2)] -> "q" + string(q1) + "->" + "q" + string(q2) + " [label=\"" + labelPrinter(label) + "\"]"
-    | (q1, label, q2)::pgs -> "q" + string(q1) + "->" + "q" + string(q2) + " [label=\"" + labelPrinter(label) + "\"]\n " + graphvizConverter(pgs) 
+    | [(q1, label, q2)] -> "q" + string(q1) + "->" + "q" + string(q2) + " [Label=\"" + labelPrinter(label) + "\"]"
+    | (q1, label, q2)::pgs -> "q" + string(q1) + "->" + "q" + string(q2) + " [Label=\"" + labelPrinter(label) + "\"]\n " + graphvizConverter(pgs) 
     
 let graphvizPrinter pg = "digraph G {\n " + graphvizConverter(pg) + "\n}"
    
@@ -90,6 +91,4 @@ let graphvizPrinter pg = "digraph G {\n " + graphvizConverter(pg) + "\n}"
 // x:=1; y:=1; z:=1; r:=1; s:=1
 // x:=2+2; if x>2 -> x:=1 [] x=2 -> x:=0 [] x<2 -> x:=-1 fi
 // x:=2+2; if x>2 -> x:=1 [] x=2 -> do x<0 -> x:=1 od [] x<2 -> x:=-1 fi
-
-
-// x:=2+2; if x>2 -> x:=1 [] x=2 AND NOT x>2 -> x:=0 [] x<2 AND NOT x>2 AND NOT x=2 -> x:=-1 fi
+// x:=(x+1)*2; if x>6 -> x:=6 [] x=6 -> do x>0 -> x:=x-1 od [] x<6 -> x:=-6 fi

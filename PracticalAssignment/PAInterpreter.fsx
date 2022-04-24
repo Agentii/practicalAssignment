@@ -40,7 +40,7 @@ and evalBExp b mem =
     | Not(x) -> not(evalBExp x mem)
     | Equal(x, y) -> evalAExp x mem = evalAExp y mem
     | NEqual(x, y) -> evalAExp x mem <> evalAExp y mem
-    | GreaterThan(x, y) -> evalAExp x mem > evalAExp y mem
+    | GreaterThan(x, y) -> (evalAExp x mem) > (evalAExp y mem)
     | GreaterEqual(x, y) -> evalAExp x mem >= evalAExp y mem
     | LessThan(x, y) -> evalAExp x mem < evalAExp y mem
     | LessEqual(x, y) -> evalAExp x mem <= evalAExp y mem
@@ -51,7 +51,7 @@ and powOf(x, y) =
     | 0 -> x
     | _ -> powOf(x*x, y-1)
 
-let memoryToString mem = Map.fold (fun e k v -> e + string(k) + ": " + string(v) + "\n") "" mem
+let memoryToString mem = Map.fold (fun e k v -> e + string(k) + ": " + string(v)) "" mem
 
 let stepPrinter actionString nodeString memString = printfn "\nAction: %s\nNode: q%s\n%s" actionString nodeString memString
 
@@ -65,13 +65,14 @@ let rec findNextEdge currNode edges mem =
     | _::edges -> findNextEdge currNode edges mem
     | [] -> None
 
+let getFinalNode (edges: (int*Label*int) list) =
+    match edges.Item(edges.Length - 1) with
+    | (_, _, q2) -> q2
 
 let interpreter gcl =
-    printf "Deterministic? [true/false]: "
-    let deterministic = (System.Console.ReadLine()) = "true"
-    let edges = compile gcl deterministic 
+    let edges = compile gcl
     let q0 = 0
-    let qfinal = edges.Length
+    let qfinal = getFinalNode edges
     let mutable mem = initMemory ()
     printf "Enter allowed steps: "
     let allowedSteps = int (System.Console.ReadLine())
@@ -95,7 +96,7 @@ let interpreter gcl =
         | _ -> let nextEdge = findNextEdge node edges mem
                match nextEdge with
                | Some (q1, label, q2) -> evalEdge (q1, label, q2)
-                                         if q2 = qfinal then ("Succesfully terminated in " + string(qfinal) + " steps!") else interpreter q2 (steps+1)
+                                         if q2 = qfinal then ("\nSuccesfully terminated in " + string(steps+1) + " steps!") else interpreter q2 (steps+1)
                | None -> "Action: Stuck"
                 
     interpreter q0 0     
